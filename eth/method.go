@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 func (t *Client) GetServerInfo() (status *ethereum.SyncProgress, err error) {
@@ -14,9 +15,20 @@ func (t *Client) GetServerInfo() (status *ethereum.SyncProgress, err error) {
 //-------------------------------------------------------------------------------------------//
 // address
 
-func (t *Client) GetAddressBalance() (status *ethereum.SyncProgress, err error) {
+func (t *Client) GetAddressBalance(address string) (balance string, err error) {
+	wei, err := t.rpc_client.BalanceAt(context.Background(), common.HexToAddress(address), nil)
+	if err != nil {
+		return "", err
+	}
+	return Conv_WeiToEth(wei.String())
+}
 
-	return
+func (t *Client) GetAddressNonce(address string) (nonce uint64, err error) {
+	return t.rpc_client.PendingNonceAt(context.Background(), common.HexToAddress(address))
+}
+
+func (t *Client) GetAddressCode(address string, blockNumber uint64) (byteCode []byte, err error) {
+	return t.rpc_client.CodeAt(context.Background(), common.HexToAddress(address), big.NewInt(int64(blockNumber)))
 }
 
 //-------------------------------------------------------------------------------------------//

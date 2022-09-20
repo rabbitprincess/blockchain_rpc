@@ -191,7 +191,11 @@ func (t *RawTx) make(utxos []*utxo) (msgTx *wire.MsgTx, leftAmount btcutil.Amoun
 		return nil, 0, err
 	}
 	for _, pt_utxo := range utxos {
-		leftAmount += btcutil.Amount(pt_utxo.FromAmount)
+		amount, err := btcutil.NewAmount(pt_utxo.FromAmount)
+		if err != nil {
+			return nil, 0, err
+		}
+		leftAmount += amount
 	}
 	for _, amount := range t.toAmounts {
 		leftAmount -= amount
