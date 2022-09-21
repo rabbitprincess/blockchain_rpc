@@ -60,36 +60,3 @@ type TransactionPayment struct {
 	DestinationTag  uint32 `json:"destination_tag,omitempty"`
 	InvoiceID       []byte `json:"invoice_id,omitempty"`
 }
-
-type Metadata struct {
-	AffectedNodes     []AffectedNodes `json:"AffectedNodes"`
-	TransactionIndex  int             `json:"TransactionIndex"`
-	TransactionResult string          `json:"TransactionResult"`
-	DeliveredAmount   Amount          `json:"delivered_amount"`
-}
-
-type AffectedNodes struct {
-	ModifiedNode ModifiedNode `json:"ModifiedNode"`
-}
-
-type ModifiedNode struct {
-	FinalFields       FinalFields    `json:"FinalFields"`
-	LedgerEntryType   string         `json:"LedgerEntryType"`
-	LedgerIndex       string         `json:"LedgerIndex"`
-	PreviousFields    PreviousFields `json:"PreviousFields"`
-	PreviousTxnID     string         `json:"PreviousTxnID"`
-	PreviousTxnLgrSeq int            `json:"PreviousTxnLgrSeq"`
-}
-
-type FinalFields struct {
-	Account    string      `json:"Account"`
-	Balance    interface{} `json:"Balance"`
-	Flags      TxFlag      `json:"Flags"`
-	OwnerCount int         `json:"OwnerCount"`
-	Sequence   int         `json:"Sequence"`
-}
-
-type PreviousFields struct {
-	Balance  interface{} `json:"Balance"`
-	Sequence int         `json:"Sequence"`
-}
