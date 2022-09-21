@@ -1,6 +1,7 @@
 package xrp
 
 import (
+	"blockchain_rpc/xrp/types"
 	"bytes"
 	"crypto/tls"
 	"io/ioutil"
@@ -29,7 +30,7 @@ func (t *Client) Init(_s_url string) (err error) {
 	return nil
 }
 
-func (t *Client) cmdSendAndRecv(req CmdReq, res CmdRes) (err error) {
+func (t *Client) cmdSendAndRecv(req types.CmdReq, res types.CmdRes) (err error) {
 	// marshal
 	btReq, err := req.Marshal()
 	if err != nil {
@@ -59,7 +60,7 @@ func (t *Client) cmdSendAndRecv(req CmdReq, res CmdRes) (err error) {
 	}
 	// 후처리 - error
 	pt_err := res.Error()
-	if pt_err.ErrCode != Ok {
+	if pt_err.ErrCode != types.Ok {
 		return pt_err
 	}
 
