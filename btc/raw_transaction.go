@@ -18,14 +18,14 @@ type RawTx struct {
 	fee         btcutil.Amount
 
 	fromPrivKeys []string
-	fromAddr     []btcutil.Address
+	fromAddrs    []btcutil.Address
 	toAmounts    map[btcutil.Address]btcutil.Amount
 }
 
 func (t *RawTx) Init(client *Client, balanceAddr string, fee float64) (err error) {
 	t.client = client
 	t.fromPrivKeys = make([]string, 0, 10)
-	t.fromAddr = make([]btcutil.Address, 0, 10)
+	t.fromAddrs = make([]btcutil.Address, 0, 10)
 	t.toAmounts = make(map[btcutil.Address]btcutil.Amount)
 
 	t.balanceAddr, err = btcutil.DecodeAddress(balanceAddr, t.client.params)
@@ -46,7 +46,7 @@ func (t *RawTx) AddFrom(privKey, address string) (err error) {
 	}
 
 	t.fromPrivKeys = append(t.fromPrivKeys, privKey)
-	t.fromAddr = append(t.fromAddr, btcAddr)
+	t.fromAddrs = append(t.fromAddrs, btcAddr)
 	return nil
 }
 
@@ -82,7 +82,7 @@ func (t *RawTx) SendTx() (txid string, err error) {
 }
 
 //--------------------------------------------------------------------------------//
-// rawtx
+// method
 
 type utxo struct {
 	Txid         string  `json:"txid"`
@@ -96,7 +96,7 @@ type utxo struct {
 func (t *RawTx) utxoGet() (utxos []*utxo, err error) {
 	// 1. separate address in wallet / out wallet
 	var addressesInWallet, addressesOutWallet []btcutil.Address
-	for _, address := range t.fromAddr {
+	for _, address := range t.fromAddrs {
 		addrInfo, err := t.client.GetAddressInfo(address.String())
 		if err != nil {
 			return nil, err

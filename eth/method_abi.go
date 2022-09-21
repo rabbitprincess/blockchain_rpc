@@ -40,13 +40,11 @@ func (t *Client) FilterQueryTransfer(contractAddresses []string, blockHash strin
 	return t.rpc_client.FilterLogs(context.Background(), query)
 }
 
-func (t *Client) MakeErc20TransferBytecode(addressTo string, amountTo *big.Int) (bytecodeTransfer []byte, err error) {
+func (t *Client) MakeErc20TransferBytecode(addressTo string, amountTo *big.Int) (bytecodeTransfer []byte) {
 	ethAddrTo := common.HexToAddress(addressTo)
 	hash := sha3.NewLegacyKeccak256()
-	_, err = hash.Write([]byte("Transfer(address,address,uint256)"))
-	if err != nil {
-		return nil, err
-	}
+	hash.Write([]byte("Transfer(address,address,uint256)"))
+
 	methodId := hash.Sum(nil)[:4]
 	addressPadded := common.LeftPadBytes(ethAddrTo.Bytes(), 32)
 	amountPadded := common.LeftPadBytes(amountTo.Bytes(), 32)
@@ -55,7 +53,7 @@ func (t *Client) MakeErc20TransferBytecode(addressTo string, amountTo *big.Int) 
 	bytecodeTransfer = append(bytecodeTransfer, methodId...)
 	bytecodeTransfer = append(bytecodeTransfer, addressPadded...)
 	bytecodeTransfer = append(bytecodeTransfer, amountPadded...)
-	return bytecodeTransfer, nil
+	return bytecodeTransfer
 }
 
 type Erc20Info struct {
@@ -68,31 +66,31 @@ type Erc20Info struct {
 
 func (t *Client) GetErc20Info(contractAddr string) (info *Erc20Info, err error) {
 	ethContractAddr := common.HexToAddress(contractAddr)
-	pt_token, err := token.NewToken(ethContractAddr, t.rpc_client)
+	token, err := token.NewToken(ethContractAddr, t.rpc_client)
 	if err != nil {
 		return nil, err
 	}
 
 	info = &Erc20Info{}
-	if pt_token == nil {
+	if token == nil {
 		return info, nil
 	}
 
 	opts := &bind.CallOpts{}
-	info.Name, err = pt_token.Name(opts)
+	info.Name, err = token.Name(opts)
 	if err != nil {
 		return nil, err
 	}
 
-	info.Symbol, err = pt_token.Symbol(opts)
+	info.Symbol, err = token.Symbol(opts)
 	if err != nil {
 		return nil, err
 	}
-	info.Decimals, err = pt_token.Decimals(opts)
+	info.Decimals, err = token.Decimals(opts)
 	if err != nil {
 		return nil, err
 	}
-	totalSupply, err := pt_token.TotalSupply(opts)
+	totalSupply, err := token.TotalSupply(opts)
 	if err != nil {
 		return nil, err
 	}

@@ -75,7 +75,7 @@ func Conv_UnitToWei(unit string, decimal uint8) (wei string, err error) {
 //  fee_burnt = Base Fee amount ( burnt )
 //  fee_tip   = Tip Fee amount ( to block miner )
 // 	fee_save  = Saving Fee amount ( refund )
-func CalcFeeCost__DynamicFee(
+func CalcFeeCost_DynamicFee(
 	gasUsed uint64,
 	baseFee string,
 	gasTipCap string,
@@ -121,17 +121,11 @@ func CalcFeeCost__DynamicFee(
 	if snFeeCap.Cmp(snTipCap) > 0 { // feecap - basefee 가 더 크면
 		snFeeCap.Sub(snTipCap)
 
-		if feeSave, err = snFeeCap.GetStr(); err != nil {
-			return "", "", "", err
-		}
-		if feeTip, err = snTipCap.GetStr(); err != nil {
-			return "", "", "", err
-		}
+		feeSave = snFeeCap.String()
+		feeTip = snTipCap.String()
 	} else { // tipcap 이 더 크면
 		feeSave = "0"
-		if feeTip, err = snFeeCap.GetStr(); err != nil {
-			return "", "", "", err
-		}
+		feeTip = snFeeCap.String()
 	}
 
 	// get fee burnt
