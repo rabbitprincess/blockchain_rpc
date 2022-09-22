@@ -27,7 +27,23 @@ type RawTx struct {
 	toAmount  string
 }
 
-func (t *RawTx) Init(client *Client, gasPrice, gasTip *big.Int) {
+// 임시 - 사용성 개선 필요
+func (t *RawTx) Init(client *Client, param *params.ChainConfig, gasTip, gasFee *big.Int, gasLimit, nonce, decimal uint64, fromPrivkey, fromAddr, tokenAddr, toAddr, toAmount string) {
+	t.client = client
+	t.param = param
+
+	t.gasFeeCap = gasFee
+	t.gasTipCap = gasTip
+	t.gasLimit = uint64(gasLimit)
+
+	t.fromPrivKey = fromPrivkey
+	t.fromAddr = fromAddr
+	t.nonce = uint64(nonce)
+
+	t.tokenAddr = tokenAddr
+	t.decimal = uint8(decimal)
+	t.toAddr = toAddr
+	t.toAmount = toAmount
 
 }
 
