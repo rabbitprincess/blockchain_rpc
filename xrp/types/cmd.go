@@ -40,7 +40,7 @@ func (t *Req_ping) Marshal() ([]byte, error) {
 	return json.Marshal(&t)
 }
 
-func (t Res_ping) Get_error() *RPCError {
+func (t Res_ping) Error() *RPCError {
 	return &t.Result.RPCError
 }
 
@@ -121,7 +121,7 @@ func (t *Req_serverInfo) Marshal() ([]byte, error) {
 	return json.Marshal(&t)
 }
 
-func (t Res_serverInfo) Get_error() *RPCError {
+func (t Res_serverInfo) Error() *RPCError {
 	return &t.Result.RPCError
 }
 
@@ -161,7 +161,7 @@ func (t *Req_fee) Marshal() ([]byte, error) {
 	return json.Marshal(&t)
 }
 
-func (t Res_fee) Get_error() *RPCError {
+func (t Res_fee) Error() *RPCError {
 	return &t.Result.RPCError
 }
 
@@ -196,7 +196,7 @@ func (t *Req_tx) Marshal() ([]byte, error) {
 	return json.Marshal(&t)
 }
 
-func (t Res_tx) Get_error() *RPCError {
+func (t Res_tx) Error() *RPCError {
 	return &t.Result.RPCError
 }
 
@@ -207,31 +207,31 @@ func (t *Res_tx) Unmarshal(_bt []byte) error {
 //------------------------------------------------------------------------//
 // account info
 
-type Req_account_info struct {
-	Method CmdType                   `json:"method"`
-	Params []Req_account_info_params `json:"params"`
+type Req_accountInfo struct {
+	Method CmdType                  `json:"method"`
+	Params []Req_accountInfo_params `json:"params"`
 }
 
-type Req_account_info_params struct {
+type Req_accountInfo_params struct {
 	Account     string `json:"account"`
 	Strict      bool   `json:"strict"`
 	LedgerIndex string `json:"ledger_index"`
 	Queue       bool   `json:"queue"`
 }
 
-type Res_account_info struct {
-	Result Res_account_info_result `json:"result"`
+type Res_accountInfo struct {
+	Result Res_accountInfo_result `json:"result"`
 }
 
-type Res_account_info_result struct {
-	AccountData Res_account_info_result_data `json:"account_data"`
-	LedgerIndex int                          `json:"ledger_index"`
-	Status      CmdStatus                    `json:"status"`
+type Res_accountInfo_result struct {
+	AccountData Res_accountInfo_result_data `json:"account_data"`
+	LedgerIndex int                         `json:"ledger_index"`
+	Status      CmdStatus                   `json:"status"`
 	RPCError
-	Request Req_account_info_params `json:"request,omitempty"`
+	Request Req_accountInfo_params `json:"request,omitempty"`
 }
 
-type Res_account_info_result_data struct {
+type Res_accountInfo_result_data struct {
 	Account           string `json:"Account"`
 	Balance           string `json:"Balance"`
 	Flags             TxFlag `json:"Flags"`
@@ -243,31 +243,31 @@ type Res_account_info_result_data struct {
 	Index             string `json:"index"`
 }
 
-func (t Req_account_info) Type() CmdType {
+func (t Req_accountInfo) Type() CmdType {
 	return t.Method
 }
 
-func (t *Req_account_info) Marshal() ([]byte, error) {
+func (t *Req_accountInfo) Marshal() ([]byte, error) {
 	return json.Marshal(&t)
 }
 
-func (t Res_account_info) Get_error() *RPCError {
+func (t Res_accountInfo) Error() *RPCError {
 	return &t.Result.RPCError
 }
 
-func (t *Res_account_info) Unmarshal(_bt []byte) error {
+func (t *Res_accountInfo) Unmarshal(_bt []byte) error {
 	return json.Unmarshal(_bt, &t)
 }
 
 //------------------------------------------------------------------------//
 // account tx
 
-type Req_account_tx struct {
-	Method CmdType                 `json:"method"`
-	Params []Req_account_tx_params `json:"params"`
+type Req_accountTx struct {
+	Method CmdType                `json:"method"`
+	Params []Req_accountTx_params `json:"params"`
 }
 
-type Req_account_tx_params struct {
+type Req_accountTx_params struct {
 	Account        string `json:"account"`
 	Binary         bool   `json:"binary"`
 	Forward        bool   `json:"forward"`
@@ -278,23 +278,23 @@ type Req_account_tx_params struct {
 	Limit          int    `json:"limit"`
 }
 
-type Res_account_tx struct {
-	Result Res_account_tx_result `json:"result"`
+type Res_accountTx struct {
+	Result Res_accountTx_result `json:"result"`
 }
 
-type Res_account_tx_result struct {
-	Account        string                       `json:"account"`
-	Marker         Res_account_tx_result_marker `json:"marker"`
-	Status         CmdStatus                    `json:"status"`
-	Transactions   []Transactions               `json:"transactions"`
-	Validated      bool                         `json:"validated"`
-	Limit          int                          `json:"limit"`
-	LedgerIndexMax int                          `json:"ledger_index_max"`
-	LedgerIndexMin int                          `json:"ledger_index_min"`
+type Res_accountTx_result struct {
+	Account        string                      `json:"account"`
+	Marker         Res_accountTx_result_marker `json:"marker"`
+	Status         CmdStatus                   `json:"status"`
+	Transactions   []Transactions              `json:"transactions"`
+	Validated      bool                        `json:"validated"`
+	Limit          int                         `json:"limit"`
+	LedgerIndexMax int                         `json:"ledger_index_max"`
+	LedgerIndexMin int                         `json:"ledger_index_min"`
 	RPCError
 }
 
-type Res_account_tx_result_marker struct {
+type Res_accountTx_result_marker struct {
 	Ledger int `json:"ledger"`
 	Seq    int `json:"seq"`
 }
@@ -305,19 +305,19 @@ type Transactions struct {
 	Validated bool           `json:"validated"`
 }
 
-func (t Req_account_tx) Type() CmdType {
+func (t Req_accountTx) Type() CmdType {
 	return t.Method
 }
 
-func (t *Req_account_tx) Marshal() ([]byte, error) {
+func (t *Req_accountTx) Marshal() ([]byte, error) {
 	return json.Marshal(&t)
 }
 
-func (t Res_account_tx) Get_error() *RPCError {
+func (t Res_accountTx) Error() *RPCError {
 	return &t.Result.RPCError
 }
 
-func (t *Res_account_tx) Unmarshal(_bt []byte) error {
+func (t *Res_accountTx) Unmarshal(_bt []byte) error {
 	return json.Unmarshal(_bt, &t)
 }
 
@@ -344,7 +344,7 @@ type Res_ledger struct {
 }
 
 type Res_ledger_Result struct {
-	Ledger      Ledger    `json:"ledger"`
+	Ledger      LedgerRes `json:"ledger"`
 	LedgerHash  string    `json:"ledger_hash"`
 	LedgerIndex int       `json:"ledger_index"`
 	Status      CmdStatus `json:"status"`
@@ -360,7 +360,7 @@ func (t *Req_ledger) Marshal() ([]byte, error) {
 	return json.Marshal(&t)
 }
 
-func (t Res_ledger) Get_error() *RPCError {
+func (t Res_ledger) Error() *RPCError {
 	return &t.Result.RPCError
 }
 
@@ -418,7 +418,7 @@ func (t *Req_walletPropose) Marshal() ([]byte, error) {
 	return json.Marshal(&t)
 }
 
-func (t Res_walletPropose) Get_error() *RPCError {
+func (t Res_walletPropose) Error() *RPCError {
 	return &t.Result.RPCError
 }
 
@@ -471,7 +471,7 @@ func (t *Req_sign) Marshal() ([]byte, error) {
 	return json.Marshal(&t)
 }
 
-func (t Res_sign) Get_error() *RPCError {
+func (t Res_sign) Error() *RPCError {
 	return &t.Result.RPCError
 }
 
@@ -561,7 +561,7 @@ func (t *Req_submit) Marshal() ([]byte, error) {
 	return json.Marshal(&t)
 }
 
-func (t Res_submit) Get_error() *RPCError {
+func (t Res_submit) Error() *RPCError {
 	return &t.Result.RPCError
 }
 
@@ -591,7 +591,7 @@ func (t *Req_offline_walletPropose) Marshal() ([]byte, error) {
 	return json.Marshal(&t)
 }
 
-func (t Res_offline_walletPropose) Get_error() *RPCError {
+func (t Res_offline_walletPropose) Error() *RPCError {
 	return &t.RPCError
 }
 
@@ -622,7 +622,7 @@ func (t *Req_offline_sign) Marshal() ([]byte, error) {
 	return json.Marshal(&t)
 }
 
-func (t Res_offline_sign) Get_error() *RPCError {
+func (t Res_offline_sign) Error() *RPCError {
 	return &t.RPCError
 }
 

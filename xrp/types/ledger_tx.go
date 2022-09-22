@@ -3,7 +3,7 @@ package types
 //--------------------------------------------------------------------------//
 // ledger
 
-type Ledger struct {
+type LedgerRes struct {
 	Accepted            bool             `json:"accepted"`
 	AccountHash         string           `json:"account_hash"`
 	CloseFlags          int              `json:"close_flags"`
@@ -59,4 +59,19 @@ type TransactionPayment struct {
 	Amount          string `json:"amount"`
 	DestinationTag  uint32 `json:"destination_tag,omitempty"`
 	InvoiceID       []byte `json:"invoice_id,omitempty"`
+}
+
+type TransactionAccountSet struct {
+	TransactionType TxType
+	Account         string
+	Fee             string
+	Sequence        uint32
+
+	EmailHash    []byte `json:",omitempty"`
+	MessageKey   []byte `json:",omitempty"`
+	Domain       []byte `json:",omitempty"`
+	TransferRate uint32 `json:",omitempty"`
+	TickSize     uint8  `json:",omitempty"`
+	SetFlag      TxFlag `json:",omitempty"`
+	ClearFlag    TxFlag `json:",omitempty"`
 }

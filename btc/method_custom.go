@@ -12,7 +12,7 @@ import (
 	"github.com/btcsuite/btcd/wire"
 )
 
-func (t *Client) sendAndRecv(req interface{}, res interface{}) (err error) {
+func (t *Client) sendCmd(req interface{}, res interface{}) (err error) {
 	chanRes := t.rpc_client.SendCmd(req)
 	bt, err := rpcclient.ReceiveFuture(chanRes)
 	if err != nil {
@@ -28,7 +28,7 @@ func (t *Client) sendAndRecv(req interface{}, res interface{}) (err error) {
 func (t *Client) ScanTxOutSet(addresses ...btcutil.Address) (result *ScanTxOutSetResult, err error) {
 	cmd := NewScanTxOutSetCmd("start", addresses)
 	result = &ScanTxOutSetResult{}
-	err = t.sendAndRecv(cmd, result)
+	err = t.sendCmd(cmd, result)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (t *Client) SignRawTransactionWithKey(tx *wire.MsgTx, inputs []RawTxInput, 
 
 	cmd := NewSignRawTransactionCmd(txid, &inputs, &privKeys, nil)
 	result := &SignRawTransactionResult{}
-	err = t.sendAndRecv(cmd, result)
+	err = t.sendCmd(cmd, result)
 	if err != nil {
 		return nil, err
 	}

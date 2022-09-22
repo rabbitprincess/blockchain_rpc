@@ -1,10 +1,7 @@
 package xrp
 
 import (
-	"blockchain_rpc/xrp/types"
-	"bytes"
 	"crypto/tls"
-	"io/ioutil"
 	"net/http"
 	"time"
 )
@@ -27,42 +24,5 @@ func (t *Client) Init(_s_url string) (err error) {
 			},
 		},
 	}
-	return nil
-}
-
-func (t *Client) cmdSendAndRecv(req types.CmdReq, res types.CmdRes) (err error) {
-	// marshal
-	btReq, err := req.Marshal()
-	if err != nil {
-		return err
-	}
-	buf := bytes.NewBuffer(btReq)
-
-	// httpReq
-	httpReq, err := http.NewRequest("POST", t.url, buf)
-	if err != nil {
-		return err
-	}
-	httpRes, err := t.rpc_client.Do(httpReq)
-	if err != nil {
-		return err
-	}
-	defer httpRes.Body.Close()
-	btRes, err := ioutil.ReadAll(httpRes.Body)
-	if err != nil {
-		return err
-	}
-
-	// unmarshal
-	err = res.Unmarshal(btRes)
-	if err != nil {
-		return err
-	}
-	// 후처리 - error
-	pt_err := res.Error()
-	if pt_err.ErrCode != types.Ok {
-		return pt_err
-	}
-
 	return nil
 }

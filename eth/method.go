@@ -16,6 +16,22 @@ func (t *Client) GetServerInfo() (status *ethereum.SyncProgress, err error) {
 	return t.rpc_client.SyncProgress(context.Background())
 }
 
+func (t *Client) SuggestGasInfo() (gasPriceWei, gasTipCapWei *big.Int, err error) {
+	context := context.Background()
+
+	gasPriceWei, err = t.rpc_client.SuggestGasPrice(context)
+	if err != nil {
+		return nil, nil, err
+	}
+	gasTipCapWei, err = t.rpc_client.SuggestGasTipCap(context)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return gasPriceWei, gasTipCapWei, nil
+
+}
+
 //-------------------------------------------------------------------------------------------//
 // address
 
@@ -65,23 +81,4 @@ func (t *Client) GetBlockInfo(blockNumber int64) (blockInfo *types.Block, err er
 
 func (t *Client) GetBlockInfoByHash(blockHash string) (blockInfo *types.Block, err error) {
 	return t.rpc_client.BlockByHash(context.Background(), common.HexToHash(blockHash))
-}
-
-//-------------------------------------------------------------------------------------------//
-// fee
-
-func (t *Client) SuggestGasInfo() (gasPriceWei, gasTipCapWei *big.Int, err error) {
-	context := context.Background()
-
-	gasPriceWei, err = t.rpc_client.SuggestGasPrice(context)
-	if err != nil {
-		return nil, nil, err
-	}
-	gasTipCapWei, err = t.rpc_client.SuggestGasTipCap(context)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return gasPriceWei, gasTipCapWei, nil
-
 }
