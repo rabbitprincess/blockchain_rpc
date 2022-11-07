@@ -282,34 +282,34 @@ func Test_BlockEncode(t *testing.T) {
 	}
 	defer client.Close()
 
-	n8_block_number, err := client.GetBlockMostRecent()
+	blockNumber, err := client.GetBlockMostRecent()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	pt_block_info, err := client.GetBlockInfo(n8_block_number)
+	blockInfo, err := client.GetBlockInfo(blockNumber)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	bt_hex__block_hash, err := eth.EncodeBlockRLP(pt_block_info)
+	blockRLP, err := eth.EncodeBlockRLP(blockInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	pt_block_info__new, err := eth.DecodeBlockRLP(bt_hex__block_hash)
+	blockInfoNew, err := eth.DecodeBlockRLP(blockRLP)
 	if err != nil {
 		t.Fatal(err)
 	}
-	bt_hex__block_hash__new, err := eth.EncodeBlockRLP(pt_block_info__new)
+	blockHashNew, err := eth.EncodeBlockRLP(blockInfoNew)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// 검증
-	if bytes.Equal(pt_block_info.Extra(), pt_block_info__new.Extra()) != true {
-		t.Fatalf("encode decode error\n\tori : %v\n\tnew : %v\n", pt_block_info.Extra(), pt_block_info__new.Extra())
+	if bytes.Equal(blockInfo.Extra(), blockInfoNew.Extra()) != true {
+		t.Fatalf("encode decode error\n\tori : %v\n\tnew : %v\n", blockInfo.Extra(), blockInfoNew.Extra())
 	}
-	if bytes.Equal(bt_hex__block_hash, bt_hex__block_hash__new) != true {
-		t.Fatalf("encode decode error\n\tori : %v\n\tnew : %v\n", bt_hex__block_hash, bt_hex__block_hash__new)
+	if bytes.Equal(blockRLP, blockHashNew) != true {
+		t.Fatalf("encode decode error\n\tori : %v\n\tnew : %v\n", blockRLP, blockHashNew)
 	}
 }
