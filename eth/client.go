@@ -4,6 +4,15 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
+func NewClient(url string) (*Client, error) {
+	client := &Client{}
+	err := client.Open(url)
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
+}
+
 type Client struct {
 	rpc_client *ethclient.Client
 }

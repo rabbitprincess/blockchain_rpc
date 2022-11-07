@@ -1,12 +1,13 @@
 package xrp
 
 import (
-	"blockchain_rpc/xrp/types"
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+
+	"github.com/gokch/blockchain_rpc/xrp/types"
 )
 
 func (t *Client) sendCmd(req types.CmdReq, res types.CmdRes) (err error) {

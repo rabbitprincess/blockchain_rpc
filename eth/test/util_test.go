@@ -1,8 +1,9 @@
 package eth_test
 
 import (
-	"blockchain_rpc/eth"
 	"testing"
+
+	"github.com/gokch/blockchain_rpc/eth"
 )
 
 func TestUnitSize(t *testing.T) {

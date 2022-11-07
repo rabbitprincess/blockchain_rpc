@@ -93,7 +93,7 @@ func (t *RawTx) make() (tx *types.Transaction, err error) {
 	}
 
 	// make dynamic fee transaction
-	tx = types.NewTx(types.DynamicFeeTx{
+	tx = types.NewTx(&types.DynamicFeeTx{
 		Nonce:     t.nonce,
 		Value:     bigAmountWei,
 		To:        &toAddress,
