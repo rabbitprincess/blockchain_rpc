@@ -261,8 +261,6 @@ func Test_BlockGetInfo(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Println(pt_block_info)
-	pt_block_info.Bloom()
 
 	fmt.Printf("block hash - %v\n", pt_block_info.TxHash())
 	fmt.Printf("block number - %v\n", pt_block_info.NumberU64())
