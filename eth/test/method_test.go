@@ -245,8 +245,7 @@ func Test_GetAddressFrom(t *testing.T) {
 // block
 
 func Test_BlockGetInfo(t *testing.T) {
-	client := &eth.Client{}
-	err := client.Open(url)
+	client, err := eth.NewClient(url)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -279,8 +278,7 @@ func Test_BlockGetInfo(t *testing.T) {
 }
 
 func Test_BlockEncode(t *testing.T) {
-	client := &eth.Client{}
-	err := client.Open(url)
+	client, err := eth.NewClient(url)
 	if err != nil {
 		t.Fatal(err)
 	}
