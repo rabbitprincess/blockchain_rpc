@@ -47,8 +47,8 @@ func (t *Client) GetNewAddress() (privKey, address string, err error) {
 	}
 
 	// get public key
-	pub, is_ok := priv.Public().(*ecdsa.PublicKey)
-	if is_ok == false {
+	pub, ok := priv.Public().(*ecdsa.PublicKey)
+	if ok == false {
 		return "", "", fmt.Errorf("public key ECDSA casting failed | key info - %v", pub)
 	}
 

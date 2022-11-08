@@ -205,7 +205,7 @@ func (t *Client) SignTransaction(tx *types.TransactionRes, privKey string) (txid
 	return txid, nil
 }
 
-func (t *Client) SendTransaction(txid string, privKey string) (res *types.Res_submit_result, err error) {
+func (t *Client) SendTransaction(txid string) (res *types.Res_submit_result, err error) {
 	cmdReq := types.Req_submit{Method: types.Cmd_Submit}
 	cmdRes := types.Res_submit{}
 	err = t.sendCmd(&cmdReq, &cmdRes)

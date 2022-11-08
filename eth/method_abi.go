@@ -117,18 +117,17 @@ func (t *Client) GetErc20BalanceOf(addr string, contractAddr string) (balance st
 		return "", err
 	}
 
-	pt_token, err := token.NewToken(common.HexToAddress(contractAddr), t.rpc_client)
+	token, err := token.NewToken(common.HexToAddress(contractAddr), t.rpc_client)
 	if err != nil {
 		return "", err
 	}
-	pt_balance, err := pt_token.BalanceOf(&bind.CallOpts{}, common.HexToAddress(addr))
+	bigBalance, err := token.BalanceOf(&bind.CallOpts{}, common.HexToAddress(addr))
 	if err != nil {
 		return "", err
 	}
 
 	// decimal 에 따라 자릿수 변경
-	balance = pt_balance.String()
-	balance, err = Conv_WeiToUnit(balance, info.Decimals)
+	balance, err = Conv_WeiToUnit(bigBalance.String(), info.Decimals)
 	if err != nil {
 		return "", err
 	}
@@ -147,43 +146,41 @@ type TransferErc20 struct {
 	Data         []byte
 }
 
-func DecodeTransfers(logs []*types.Log) (arrpt_transfer []*TransferErc20, err error) {
-	pt_contract_abi, err := abi.JSON(strings.NewReader(token.TokenABI))
+func DecodeTransfers(logs []*types.Log) (transfers []*TransferErc20, err error) {
+	abi, err := abi.JSON(strings.NewReader(token.TokenABI))
 	if err != nil {
 		return nil, err
 	}
-	pt_fn_transfer_sig_hash := crypto.Keccak256Hash([]byte("transfer(address,uint256)"))
-	pt_log_transfer_sig_hash := crypto.Keccak256Hash([]byte("Transfer(address,address,uint256)"))
-	arrpt_transfer = make([]*TransferErc20, 0, len(logs))
-	for _, pt_log := range logs {
-		switch pt_log.Topics[0] {
-		case pt_fn_transfer_sig_hash, pt_log_transfer_sig_hash:
-			if len(pt_log.Data) == 0 {
+	fnSigHash := crypto.Keccak256Hash([]byte("transfer(address,uint256)"))
+	logSigHash := crypto.Keccak256Hash([]byte("Transfer(address,address,uint256)"))
+	transfers = make([]*TransferErc20, 0, len(logs))
+	for _, log := range logs {
+		switch log.Topics[0] {
+		case fnSigHash, logSigHash:
+			if len(log.Data) == 0 {
 				// erc 721 거래 등의 이유로 data 가 없을 수 있음
 				continue
 			}
 
-			var pt_transfer TransferErc20
-			err = pt_contract_abi.UnpackIntoInterface(&pt_transfer, "Transfer", pt_log.Data)
+			var transfer TransferErc20
+			err = abi.UnpackIntoInterface(&transfer, "Transfer", log.Data)
 			if err != nil {
-				return
+				return nil, err
 			}
-			if len(pt_log.Topics) < 3 {
-				err = fmt.Errorf("invalid contract form (%v)", "Transfer")
-				return
+			if len(log.Topics) < 3 {
+				return nil, fmt.Errorf("invalid contract form (%v)", "Transfer")
 			}
-			pt_transfer.From = pt_log.Topics[1].Hex()
-			pt_transfer.To = pt_log.Topics[2].Hex()
-			pt_transfer.BlockHash = pt_log.BlockHash.Hex()
-			pt_transfer.TxHash = pt_log.TxHash.Hex()
-			pt_transfer.ContractAddr = pt_log.Address.Hex()
-			pt_transfer.Removed = pt_log.Removed
-			pt_transfer.Data = pt_log.Data
-			arrpt_transfer = append(arrpt_transfer, &pt_transfer)
+			transfer.From = log.Topics[1].Hex()
+			transfer.To = log.Topics[2].Hex()
+			transfer.BlockHash = log.BlockHash.Hex()
+			transfer.TxHash = log.TxHash.Hex()
+			transfer.ContractAddr = log.Address.Hex()
+			transfer.Removed = log.Removed
+			transfer.Data = log.Data
+			transfers = append(transfers, &transfer)
 		default:
 			continue // 다른 method 일 경우
 		}
 	}
-
-	return arrpt_transfer, nil
+	return transfers, nil
 }
