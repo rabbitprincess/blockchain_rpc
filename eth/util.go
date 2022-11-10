@@ -83,9 +83,9 @@ func Conv_UnitToWei(unit string, decimal uint8) (wei string, err error) {
 //
 // ret
 //
-//	 fee_burnt = Base Fee amount ( burnt )
-//	 fee_tip   = Tip Fee amount ( to block miner )
-//		fee_save  = Saving Fee amount ( refund )
+//	feeBurnt = Base Fee amount ( burnt )
+//	feeTip   = Tip Fee amount ( to block miner )
+//	feeSave  = Saving Fee amount ( refund )
 func CalcFeeCost_DynamicFee(
 	gasUsed uint64,
 	baseFee string,

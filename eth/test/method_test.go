@@ -10,15 +10,18 @@ import (
 )
 
 const (
-	DEF_url_local_goeril  = "http://10.1.1.61:8546"
-	DEF_url_remote_goeril = "https://goerli.infura.io/v3/c88b23ec7c6d4ec581e45f1f1a9afc9e"
+	DEF_url_local_goeril   = "http://10.1.1.61:8546"
+	DEF_url_remote_goeril  = "https://goerli.infura.io/v3/c88b23ec7c6d4ec581e45f1f1a9afc9e"
+	DEF_url_local_mainnet  = "https://eth-node.cccv.to:8545"
+	DEF_url_remote_mainnet = "https://mainnet.infura.io/v3/c88b23ec7c6d4ec581e45f1f1a9afc9e"
 
-	url string = DEF_url_remote_goeril
+	url string = DEF_url_remote_mainnet
 
-	DEF_private_key = "aa41425d6df6460c9dc413275830a152d5a9851713661f8c48f2494461bee885"
-	DEF_address     = "0xe5bDa4eEd3FD91793632604B79cFc97372617eB4"
-	DEF_token__BNB  = "0x64BBF67A8251F7482330C33E65b08B835125e018"
-	DEF_token__KCH  = "0x48c8fb83907FcD67cA5F703658f2416630E3bA2a"
+	DEF_private_key  = "aa41425d6df6460c9dc413275830a152d5a9851713661f8c48f2494461bee885"
+	DEF_address      = "0xe5bDa4eEd3FD91793632604B79cFc97372617eB4"
+	DEF_token__BNB   = "0x64BBF67A8251F7482330C33E65b08B835125e018"
+	DEF_token__KCH   = "0x48c8fb83907FcD67cA5F703658f2416630E3bA2a"
+	DEF_token__AERGO = "0x91Af0fBB28ABA7E31403Cb457106Ce79397FD4E6"
 )
 
 func Test_ServerInfo(t *testing.T) {
@@ -141,7 +144,7 @@ func Test_GetErc20Info(t *testing.T) {
 	defer client.Close()
 
 	// BNB
-	info, err := client.GetErc20Info(DEF_token__BNB)
+	info, err := client.GetErc20Info(DEF_token__AERGO)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -176,44 +179,30 @@ func Test_GetErc20QueryAndReceipt(t *testing.T) {
 	}
 	defer client.Close()
 
-	n_block_num, err := client.GetBlockMostRecent()
+	// get block info
+	blockInfo, err := client.GetBlockInfo(15934533)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_ = n_block_num
-	pt_block_info, err := client.GetBlockInfo(12895502)
-	if err != nil {
-		t.Fatal(err)
-	}
-	txs := pt_block_info.Transactions()
-	blockHash := pt_block_info.Hash().String()
-	fmt.Println(pt_block_info.Number())
+	blockHash := blockInfo.Hash().String()
 
-	logs, err := client.FilterQueryTransfer(nil, blockHash)
+	// get logs in block ( aergo token only )
+	logs, err := client.FilterLogs([]string{DEF_token__AERGO}, blockHash)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// decode logs ( transfer only )
 	transfers, err := eth.DecodeTransfers(logs)
-	for _, pt_transfer := range transfers {
-		fmt.Println(pt_transfer.ContractAddr)
+	if err != nil {
+		t.Fatal(err)
 	}
-	for _, pt_tx := range txs {
-		isContract, err := client.ValidAddress(pt_tx.To().String())
-		if err != nil {
-			t.Fatal(err)
-		}
-		if isContract == true {
-			receipt, err := client.GetTxReceipt(pt_tx.Hash().String())
-			if err != nil {
-				t.Fatal(err)
-			} else if receipt == nil {
-				t.Fatal("not exist receipt")
-			}
 
-			transfers, err := eth.DecodeTransfers(receipt.Logs)
-			for _, pt_transfer := range transfers {
-				fmt.Println(pt_transfer.ContractAddr)
-			}
-		} else {
-			fmt.Println("it is not smart contract")
-		}
+	for _, transfer := range transfers {
+		fmt.Println("token  :", transfer.ContractAddr)
+		fmt.Println("from   :", transfer.From)
+		fmt.Println("to     :", transfer.To)
+		fmt.Println("amount :", transfer.Amount)
 	}
 }
 

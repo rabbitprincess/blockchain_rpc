@@ -4,12 +4,10 @@ import (
 	"context"
 	"fmt"
 	"math/big"
-	"strings"
 
 	token "github.com/gokch/blockchain_rpc/eth/smart_contract"
 
 	"github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -23,8 +21,7 @@ type ApprovalLog struct {
 	Tokens     *big.Int
 }
 
-func (t *Client) FilterQueryTransfer(contractAddresses []string, blockHash string) (logs []*types.Log, err error) {
-	logTransferSigHash := crypto.Keccak256Hash([]byte("transfer(address,uint256)"))
+func (t *Client) FilterLogs(contractAddresses []string, blockHash string) (logs []*types.Log, err error) {
 	ethBlockHash := common.HexToHash(blockHash)
 
 	var ethContractAddresses []common.Address
@@ -38,7 +35,7 @@ func (t *Client) FilterQueryTransfer(contractAddresses []string, blockHash strin
 	query := ethereum.FilterQuery{
 		BlockHash: &ethBlockHash,
 		Addresses: ethContractAddresses,
-		Topics:    [][]common.Hash{{logTransferSigHash}},
+		Topics:    nil,
 	}
 	typesLogs, err := t.rpc_client.FilterLogs(context.Background(), query)
 	if err != nil {
@@ -147,10 +144,6 @@ type TransferErc20 struct {
 }
 
 func DecodeTransfers(logs []*types.Log) (transfers []*TransferErc20, err error) {
-	abi, err := abi.JSON(strings.NewReader(token.TokenABI))
-	if err != nil {
-		return nil, err
-	}
 	fnSigHash := crypto.Keccak256Hash([]byte("transfer(address,uint256)"))
 	logSigHash := crypto.Keccak256Hash([]byte("Transfer(address,address,uint256)"))
 	transfers = make([]*TransferErc20, 0, len(logs))
@@ -161,23 +154,25 @@ func DecodeTransfers(logs []*types.Log) (transfers []*TransferErc20, err error) 
 				// erc 721 거래 등의 이유로 data 가 없을 수 있음
 				continue
 			}
-
-			var transfer TransferErc20
-			err = abi.UnpackIntoInterface(&transfer, "Transfer", log.Data)
-			if err != nil {
-				return nil, err
-			}
 			if len(log.Topics) < 3 {
 				return nil, fmt.Errorf("invalid contract form (%v)", "Transfer")
 			}
-			transfer.From = log.Topics[1].Hex()
-			transfer.To = log.Topics[2].Hex()
-			transfer.BlockHash = log.BlockHash.Hex()
-			transfer.TxHash = log.TxHash.Hex()
-			transfer.ContractAddr = log.Address.Hex()
-			transfer.Removed = log.Removed
-			transfer.Data = log.Data
-			transfers = append(transfers, &transfer)
+			amount := big.NewInt(0).SetBytes(log.Data)
+			from := common.HexToAddress(log.Topics[1].Hex())
+			to := common.HexToAddress(log.Topics[2].Hex())
+
+			transfer := &TransferErc20{
+				From:   from.Hex(),
+				To:     to.Hex(),
+				Amount: amount.String(),
+
+				Removed:      log.Removed,
+				BlockHash:    log.BlockHash.Hex(),
+				TxHash:       log.TxHash.Hex(),
+				ContractAddr: log.Address.Hex(),
+				Data:         log.Data,
+			}
+			transfers = append(transfers, transfer)
 		default:
 			continue // 다른 method 일 경우
 		}
