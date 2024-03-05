@@ -1,4 +1,4 @@
-package eth_test
+package eth
 
 import (
 	"bytes"
@@ -6,26 +6,10 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/gokch/blockchain_rpc/eth"
 )
 
-const (
-	DEF_url_local_goeril   = "http://10.1.1.61:8546"
-	DEF_url_remote_goeril  = "https://goerli.infura.io/v3/c88b23ec7c6d4ec581e45f1f1a9afc9e"
-	DEF_url_local_mainnet  = "https://eth-node.cccv.to:8545"
-	DEF_url_remote_mainnet = "https://mainnet.infura.io/v3/c88b23ec7c6d4ec581e45f1f1a9afc9e"
-
-	url string = DEF_url_remote_mainnet
-
-	DEF_private_key  = "aa41425d6df6460c9dc413275830a152d5a9851713661f8c48f2494461bee885"
-	DEF_address      = "0xe5bDa4eEd3FD91793632604B79cFc97372617eB4"
-	DEF_token__BNB   = "0x64BBF67A8251F7482330C33E65b08B835125e018"
-	DEF_token__KCH   = "0x48c8fb83907FcD67cA5F703658f2416630E3bA2a"
-	DEF_token__AERGO = "0x91Af0fBB28ABA7E31403Cb457106Ce79397FD4E6"
-)
-
-func Test_ServerInfo(t *testing.T) {
-	client, err := eth.NewClient(url)
+func TestServerInfo(t *testing.T) {
+	client, err := NewClient(url)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,14 +30,14 @@ func Test_ServerInfo(t *testing.T) {
 //-----------------------------------------------------------------------------//
 // address
 
-func Test_GetAddressBalance(t *testing.T) {
-	client, err := eth.NewClient(url)
+func TestGetAddressBalance(t *testing.T) {
+	client, err := NewClient(url)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer client.Close()
 
-	balance, err := client.GetAddressBalance(DEF_address)
+	balance, err := client.GetAddressBalance(DEF_Address)
 	if err != nil {
 		t.Fatal("balance at fail |", err)
 	}
@@ -63,8 +47,8 @@ func Test_GetAddressBalance(t *testing.T) {
 //-----------------------------------------------------------------------------//
 // fee
 
-func Test_FeeSuggestGas(t *testing.T) {
-	client, err := eth.NewClient(url)
+func TestFeeSuggestGas(t *testing.T) {
+	client, err := NewClient(url)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,12 +62,12 @@ func Test_FeeSuggestGas(t *testing.T) {
 	snPrice := price.String()
 	snTipCap := tipcap.String()
 
-	gasPriceGwei, err := eth.Conv_WeiToGwei(snPrice)
+	gasPriceGwei, err := Conv_WeiToGwei(snPrice)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	gasTipCapGwei, err := eth.Conv_WeiToGwei(snTipCap)
+	gasTipCapGwei, err := Conv_WeiToGwei(snTipCap)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,8 +78,8 @@ func Test_FeeSuggestGas(t *testing.T) {
 //-----------------------------------------------------------------------------//
 // tx
 
-func Test_TxGetRawData(t *testing.T) {
-	client := &eth.Client{}
+func TestTxGetRawData(t *testing.T) {
+	client := &Client{}
 	err := client.Open(url)
 	if err != nil {
 		t.Fatal(err)
@@ -117,13 +101,13 @@ func Test_TxGetRawData(t *testing.T) {
 		t.Fatal("get tx fail |", err)
 	}
 
-	hexTxid, err := eth.EncodeTxRLP(txRaw)
+	hexTxid, err := EncodeTxRLP(txRaw)
 	if err != nil {
 		t.Fatal(err)
 	}
 	buf := bytes.NewBuffer(nil)
 	txRaw.EncodeRLP(buf)
-	pt_tx_raw__new, err := eth.DecodeTxRLP(hexTxid)
+	pt_tx_raw__new, err := DecodeTxRLP(hexTxid)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -136,44 +120,44 @@ func Test_TxGetRawData(t *testing.T) {
 	}
 }
 
-func Test_GetErc20Info(t *testing.T) {
-	client, err := eth.NewClient(url)
+func TestGetErc20Info(t *testing.T) {
+	client, err := NewClient(url)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer client.Close()
 
 	// BNB
-	info, err := client.GetErc20Info(DEF_token__AERGO)
+	info, err := client.GetErc20Info(DEF_TokenAERGO)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(info.IsFunded, info.Name, info.Symbol, info.TotalSupply)
 
 	// KCH
-	info, err = client.GetErc20Info(DEF_token__KCH)
+	info, err = client.GetErc20Info(DEF_TokenKCH)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(info.IsFunded, info.Name, info.Symbol, info.TotalSupply)
 }
 
-func Test_GetErc20TokenBalance(t *testing.T) {
-	client, err := eth.NewClient(url)
+func TestGetErc20TokenBalance(t *testing.T) {
+	client, err := NewClient(url)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer client.Close()
 
-	balance, err := client.GetErc20BalanceOf(DEF_address, DEF_token__KCH)
+	balance, err := client.GetErc20BalanceOf(DEF_Address, DEF_TokenKCH)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(balance)
 }
 
-func Test_GetErc20QueryAndReceipt(t *testing.T) {
-	client, err := eth.NewClient(url)
+func TestGetErc20QueryAndReceipt(t *testing.T) {
+	client, err := NewClient(url)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -187,13 +171,13 @@ func Test_GetErc20QueryAndReceipt(t *testing.T) {
 	blockHash := blockInfo.Hash().String()
 
 	// get logs in block ( aergo token only )
-	logs, err := client.FilterLogs([]string{DEF_token__AERGO}, blockHash)
+	logs, err := client.FilterLogs([]string{DEF_TokenAERGO}, blockHash)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// decode logs ( transfer only )
-	transfers, err := eth.DecodeTransfers(logs)
+	transfers, err := DecodeTransfers(logs)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -206,8 +190,8 @@ func Test_GetErc20QueryAndReceipt(t *testing.T) {
 	}
 }
 
-func Test_GetAddressFrom(t *testing.T) {
-	client, err := eth.NewClient(url)
+func TestGetAddressFrom(t *testing.T) {
+	client, err := NewClient(url)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -222,7 +206,7 @@ func Test_GetAddressFrom(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, tx := range blockInfo.Transactions() {
-		from, err := eth.AddressGetSender(tx, params.RopstenChainConfig)
+		from, err := AddressGetSender(tx, params.RopstenChainConfig)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -233,8 +217,8 @@ func Test_GetAddressFrom(t *testing.T) {
 //-----------------------------------------------------------------------------//
 // block
 
-func Test_BlockGetInfo(t *testing.T) {
-	client, err := eth.NewClient(url)
+func TestBlockGetInfo(t *testing.T) {
+	client, err := NewClient(url)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -264,8 +248,8 @@ func Test_BlockGetInfo(t *testing.T) {
 	}
 }
 
-func Test_BlockEncode(t *testing.T) {
-	client, err := eth.NewClient(url)
+func TestBlockEncode(t *testing.T) {
+	client, err := NewClient(url)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -281,16 +265,16 @@ func Test_BlockEncode(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	blockRLP, err := eth.EncodeBlockRLP(blockInfo)
+	blockRLP, err := EncodeBlockRLP(blockInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	blockInfoNew, err := eth.DecodeBlockRLP(blockRLP)
+	blockInfoNew, err := DecodeBlockRLP(blockRLP)
 	if err != nil {
 		t.Fatal(err)
 	}
-	blockHashNew, err := eth.EncodeBlockRLP(blockInfoNew)
+	blockHashNew, err := EncodeBlockRLP(blockInfoNew)
 	if err != nil {
 		t.Fatal(err)
 	}

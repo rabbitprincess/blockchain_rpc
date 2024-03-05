@@ -23,7 +23,7 @@ func (t *Client) sendCmd(req types.CmdReq, res types.CmdRes) (err error) {
 	if err != nil {
 		return err
 	}
-	httpRes, err := t.rpc_client.Do(httpReq)
+	httpRes, err := t.rpc.Do(httpReq)
 	if err != nil {
 		return err
 	}
@@ -39,9 +39,9 @@ func (t *Client) sendCmd(req types.CmdReq, res types.CmdRes) (err error) {
 		return err
 	}
 	// 후처리 - error
-	pt_err := res.Error()
-	if pt_err.ErrCode != types.Ok {
-		return pt_err
+	resErr := res.Error()
+	if resErr.ErrCode != types.Ok {
+		return resErr
 	}
 
 	return nil
@@ -68,19 +68,19 @@ func (t *Client) GetServerInfo() (res *types.Res_serverInfo_result, err error) {
 }
 
 func (t *Client) GetBaseFee() (baseFee string, err error) {
-	t_req := types.Req_fee{Method: types.Cmd_Fee}
-	t_res := types.Res_fee{}
-	err = t.sendCmd(&t_req, &t_res)
+	req := types.Req_fee{Method: types.Cmd_Fee}
+	res := types.Res_fee{}
+	err = t.sendCmd(&req, &res)
 	if err != nil {
 		return "", err
 	}
 	// 에러 처리
-	rpcError := t_res.Error()
+	rpcError := res.Error()
 	if rpcError.ErrCode != types.Ok {
 		return "", rpcError
 	}
 
-	baseFee = t_res.Result.Drops.BaseFee
+	baseFee = res.Result.Drops.BaseFee
 	return baseFee, nil
 }
 
@@ -138,7 +138,7 @@ func (t *Client) GetAccountTx(account string, ledgerMin, ledgerMax int) (res *ty
 func (t *Client) WalletPropose(privKey string) (res *types.Res_walletPropose_Result, err error) {
 	cmdReq := types.Req_walletPropose{Method: types.Cmd_WalletPropose}
 	if privKey != "" {
-		cmdReq.Params = []types.Req_walletPropose_params{{Seed: privKey, KeyType: types.TD_s_key_type__secp256k1}}
+		cmdReq.Params = []types.Req_walletPropose_params{{Seed: privKey, KeyType: types.Secp256k1}}
 	}
 	cmdRes := types.Res_walletPropose{}
 	err = t.sendCmd(&cmdReq, &cmdRes)

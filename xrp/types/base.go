@@ -13,24 +13,24 @@ type Seed []byte
 //--------------------------------------------------------------------------//
 // key
 
-type TD_s_key_type string
+type Sign string
 
 const (
-	TD_s_key_type__secp256k1 TD_s_key_type = "secp256k1"
-	TD_s_key_type__ed25519   TD_s_key_type = "ed25519"
+	Secp256k1 Sign = "secp256k1"
+	Ed25519   Sign = "ed25519"
 )
 
 //--------------------------------------------------------------------------//
 // currency
 
-type TD_u1_currecncy_type uint8
+type Currency uint8
 
 const (
-	TD_u1__XRP       TD_u1_currecncy_type = 0
-	TD_u1__STANDARD  TD_u1_currecncy_type = 1
-	TD_u1__DEMURRAGE TD_u1_currecncy_type = 2
-	TD_u1__HEX       TD_u1_currecncy_type = 3
-	TD_u1__UNKNOWN   TD_u1_currecncy_type = 4
+	XRP       Currency = 0
+	STANDARD  Currency = 1
+	DEMURRAGE Currency = 2
+	HEX       Currency = 3
+	UNKNOWN   Currency = 4
 )
 
 //--------------------------------------------------------------------------//
@@ -103,14 +103,15 @@ type Memo struct {
 // wallet
 
 type Wallet struct {
-	S_private_key    string `json:"privateKey"`
-	S_public_key     string `json:"publicKey"`
-	S_wallet_address string `json:"classicAddress"`
-	S_seed           string `json:"seed"`
+	PrivateKey     string `json:"privateKey"`
+	PubKey         string `json:"publicKey"`
+	ClassicAddress string `json:"classicAddress"`
+	Seed           string `json:"seed"`
 }
 
 //--------------------------------------------------------------------------//
 // tx type
+
 type TxType string
 
 const (

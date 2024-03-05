@@ -7,14 +7,14 @@ import (
 )
 
 type Client struct {
-	url        string
-	rpc_client *http.Client
+	url string
+	rpc *http.Client
 }
 
-func (t *Client) Init(_s_url string) (err error) {
+func (t *Client) Init(url string) (err error) {
 	// init client http
-	t.url = _s_url
-	t.rpc_client = &http.Client{
+	t.url = url
+	t.rpc = &http.Client{
 		Transport: &http.Transport{
 			MaxIdleConns:       10,
 			IdleConnTimeout:    30 * time.Second,

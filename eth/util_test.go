@@ -1,26 +1,24 @@
-package eth_test
+package eth
 
 import (
 	"testing"
-
-	"github.com/gokch/blockchain_rpc/eth"
 )
 
 func TestUnitSize(t *testing.T) {
 	// wei to eth
-	WeiToEth, _ := eth.Conv_WeiToEth("1")
+	WeiToEth, _ := Conv_WeiToEth("1")
 	if WeiToEth != "0.000000000000000001" {
 		t.Errorf("invalid wei_to_eth | expect : 0.000000000000000001 | result : %s", WeiToEth)
 	}
 
 	// wei to gwei
-	WeiToGwei, _ := eth.Conv_WeiToGwei("1")
+	WeiToGwei, _ := Conv_WeiToGwei("1")
 	if WeiToGwei != "0.000000001" {
 		t.Errorf("invalid wei_to_gwei | expect : 0.000000001 | result : %s", WeiToGwei)
 	}
 
 	// eth to wei
-	EthToWei, _ := eth.Conv_EthToWei("1")
+	EthToWei, _ := Conv_EthToWei("1")
 	if EthToWei != "1000000000000000000" {
 		t.Errorf("invalid eth_to_wei | expect : 1000000000000000000 | result : %s", EthToWei)
 	}
@@ -40,7 +38,7 @@ func TestDynamicFee(t *testing.T) {
 	}
 
 	fn := func(_t_input TestInput) {
-		feeBurnt, feeTip, feeSave, err := eth.CalcFeeCost_DynamicFee(_t_input.inputGasUsed, _t_input.inputBaseFee, _t_input.inputTipCap, _t_input.inputFeeCap)
+		feeBurnt, feeTip, feeSave, err := CalcFeeCost_DynamicFee(_t_input.inputGasUsed, _t_input.inputBaseFee, _t_input.inputTipCap, _t_input.inputFeeCap)
 		if err != nil && err.Error() != _t_input.errMsg {
 			t.Errorf("\nerr is not same | output - %v | expect - %v", err, _t_input.errMsg)
 		}
@@ -223,13 +221,13 @@ func TestDynamicFee(t *testing.T) {
 /*
 func Test_txid__encode_decode(t *testing.T) {
 	s_txid := "0xc9ec67d71b6a59eac2908ce8676c95c2df2e036f04bf0c30e7beeefc907e4d2b"
-	bt_txid, err := eth.Encode__txid(s_txid)
+	bt_txid, err := Encode__txid(s_txid)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(bt_txid)
 
-	td_s_txid_copy, err := eth.Decode__txid(bt_txid)
+	td_s_txid_copy, err := Decode__txid(bt_txid)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -13,7 +13,7 @@ import (
 )
 
 func (t *Client) sendCmd(req interface{}, res interface{}) (err error) {
-	chanRes := t.rpc_client.SendCmd(req)
+	chanRes := t.rpc.SendCmd(req)
 	bt, err := rpcclient.ReceiveFuture(chanRes)
 	if err != nil {
 		return err
@@ -87,8 +87,8 @@ func NewScanTxOutSetCmd(Action string, addresses []btcutil.Address) *ScanTxOutSe
 	cmd.Action = &Action
 	scans := make([]string, 0, len(addresses))
 	for _, address := range addresses {
-		s_scan := fmt.Sprintf("addr(%s)", address.String())
-		scans = append(scans, s_scan)
+		scan := fmt.Sprintf("addr(%s)", address.String())
+		scans = append(scans, scan)
 	}
 	cmd.ScanObjects = &scans
 	return cmd

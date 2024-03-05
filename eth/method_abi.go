@@ -37,7 +37,7 @@ func (t *Client) FilterLogs(contractAddresses []string, blockHash string) (logs 
 		Addresses: ethContractAddresses,
 		Topics:    nil,
 	}
-	typesLogs, err := t.rpc_client.FilterLogs(context.Background(), query)
+	typesLogs, err := t.rpc.FilterLogs(context.Background(), query)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ type Erc20Info struct {
 
 func (t *Client) GetErc20Info(contractAddr string) (info *Erc20Info, err error) {
 	ethContractAddr := common.HexToAddress(contractAddr)
-	token, err := token.NewToken(ethContractAddr, t.rpc_client)
+	token, err := token.NewToken(ethContractAddr, t.rpc)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (t *Client) GetErc20BalanceOf(addr string, contractAddr string) (balance st
 		return "", err
 	}
 
-	token, err := token.NewToken(common.HexToAddress(contractAddr), t.rpc_client)
+	token, err := token.NewToken(common.HexToAddress(contractAddr), t.rpc)
 	if err != nil {
 		return "", err
 	}

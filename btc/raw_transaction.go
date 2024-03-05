@@ -60,20 +60,20 @@ func (t *RawTx) AddTo(address string, amount btcutil.Amount) (err error) {
 }
 
 func (t *RawTx) SendTx() (txid string, err error) {
-	arrpt_utxo, err := t.utxoGet()
+	utxo, err := t.utxoGet()
 	if err != nil {
 		return "", err
 	}
 
-	msgTx, leftAmount, err := t.make(arrpt_utxo)
+	msgTx, leftAmount, err := t.make(utxo)
 	if err != nil {
 		return "", err
 	}
-	msgTxFunded, err := t.fund(msgTx, arrpt_utxo, leftAmount)
+	msgTxFunded, err := t.fund(msgTx, utxo, leftAmount)
 	if err != nil {
 		return "", err
 	}
-	msgTxSigned, err := t.sign(msgTxFunded, arrpt_utxo)
+	msgTxSigned, err := t.sign(msgTxFunded, utxo)
 	if err != nil {
 		return "", err
 	}
@@ -131,7 +131,7 @@ func (t *RawTx) utxoGet() (utxos []*utxo, err error) {
 	// 4. make utxo
 	utxos = make([]*utxo, 0, len(utxosInWallet))
 	for _, utxoInWallet := range utxosInWallet {
-		pt_utxo := &utxo{
+		utxo := &utxo{
 			Txid:         utxoInWallet.TxID,
 			Vout:         utxoInWallet.Vout,
 			FromAddr:     utxoInWallet.Address,
@@ -139,22 +139,22 @@ func (t *RawTx) utxoGet() (utxos []*utxo, err error) {
 			ScriptPubKey: utxoInWallet.ScriptPubKey,
 			RedeemScript: utxoInWallet.RedeemScript,
 		}
-		utxos = append(utxos, pt_utxo)
+		utxos = append(utxos, utxo)
 	}
 
-	for _, t_utxo__out_wallet := range utxosOutWallet {
-		s_wallet_addr, err := decodeDescToAddr(t_utxo__out_wallet.Desc)
+	for _, utxoOutWallet := range utxosOutWallet {
+		walletAddr, err := decodeDescToAddr(utxoOutWallet.Desc)
 		if err != nil {
 			return nil, err
 		}
-		pt_utxo := &utxo{
-			Txid:         t_utxo__out_wallet.TxID,
-			Vout:         t_utxo__out_wallet.Vout,
-			FromAddr:     s_wallet_addr,
-			FromAmount:   t_utxo__out_wallet.Amount,
-			ScriptPubKey: t_utxo__out_wallet.ScriptPubKey,
+		utxo := &utxo{
+			Txid:         utxoOutWallet.TxID,
+			Vout:         utxoOutWallet.Vout,
+			FromAddr:     walletAddr,
+			FromAmount:   utxoOutWallet.Amount,
+			ScriptPubKey: utxoOutWallet.ScriptPubKey,
 		}
-		utxos = append(utxos, pt_utxo)
+		utxos = append(utxos, utxo)
 	}
 
 	return utxos, nil
@@ -180,7 +180,7 @@ func (t *RawTx) make(utxos []*utxo) (msgTx *wire.MsgTx, leftAmount btcutil.Amoun
 		txsInput = append(txsInput, txInput)
 	}
 
-	msgTx, err = t.client.rpc_client.CreateRawTransaction(txsInput, t.toAmounts, nil)
+	msgTx, err = t.client.rpc.CreateRawTransaction(txsInput, t.toAmounts, nil)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -190,8 +190,8 @@ func (t *RawTx) make(utxos []*utxo) (msgTx *wire.MsgTx, leftAmount btcutil.Amoun
 	if err != nil {
 		return nil, 0, err
 	}
-	for _, pt_utxo := range utxos {
-		amount, err := btcutil.NewAmount(pt_utxo.FromAmount)
+	for _, utxo := range utxos {
+		amount, err := btcutil.NewAmount(utxo.FromAmount)
 		if err != nil {
 			return nil, 0, err
 		}
@@ -222,33 +222,33 @@ func (t *RawTx) fund(msgTx *wire.MsgTx, utxos []*utxo, leftAmount btcutil.Amount
 		_, vsize := getRawTxSize(msgTxSigned)
 
 		// 단위 수수료 변경 ( btc per kb -> satoshi per byte )
-		feePerByte_Satoshi := int64(t.fee.ToUnit(btcutil.AmountSatoshi + btcutil.AmountKiloBTC))
-		if feePerByte_Satoshi < 0 {
-			return nil, fmt.Errorf("invalid fee per byte ( satoshi ) | %v", feePerByte_Satoshi)
+		feePerByteSatoshi := int64(t.fee.ToUnit(btcutil.AmountSatoshi + btcutil.AmountKiloBTC))
+		if feePerByteSatoshi < 0 {
+			return nil, fmt.Errorf("invalid fee per byte ( satoshi ) | %v", feePerByteSatoshi)
 		}
 
 		// p2pkh size = 34
-		feeRawTx := int64(vsize+34) * feePerByte_Satoshi
+		feeRawTx := int64(vsize+34) * feePerByteSatoshi
 
-		// amount_left 를 satoshi 단위로 변경
-		leftAmount_Satoshi := int64(leftAmount.ToUnit(btcutil.AmountSatoshi))
-		if leftAmount_Satoshi < 0 {
+		// left amount 를 satoshi 단위로 변경
+		leftAmountSatoshi := int64(leftAmount.ToUnit(btcutil.AmountSatoshi))
+		if leftAmountSatoshi < 0 {
 			return nil, fmt.Errorf("invalid left amount ( satoshi ) | %v", leftAmount)
 		}
 
 		// amount left 에서 전체 수수료로 뺀 값이 balance address 에 들어갈 금액
-		leftAmountWithoutFee = leftAmount_Satoshi - feeRawTx
+		leftAmountWithoutFee = leftAmountSatoshi - feeRawTx
 		if leftAmountWithoutFee < 0 {
-			return nil, fmt.Errorf("not enough amount left without fee | amount_left : %v | fee - %v", leftAmount, feeRawTx)
+			return nil, fmt.Errorf("not enough amount left without fee | left : %v | fee - %v", leftAmount, feeRawTx)
 		}
 	}
 
 	// add balance address to vout
-	bt_addr_to, err := txscript.PayToAddrScript(t.balanceAddr)
+	toAddr, err := txscript.PayToAddrScript(t.balanceAddr)
 	if err != nil {
 		return nil, err
 	}
-	msgTx.AddTxOut(wire.NewTxOut(leftAmountWithoutFee, bt_addr_to))
+	msgTx.AddTxOut(wire.NewTxOut(leftAmountWithoutFee, toAddr))
 
 	return msgTx, nil
 }
@@ -283,7 +283,7 @@ func (t *RawTx) sign(msgTxFunded *wire.MsgTx, utxos []*utxo) (msgTxSigned *wire.
 }
 
 func (t *RawTx) send(msgTxSigned *wire.MsgTx) (txid string, err error) {
-	hash, err := t.client.rpc_client.SendRawTransaction(msgTxSigned, false)
+	hash, err := t.client.rpc.SendRawTransaction(msgTxSigned, false)
 	if err != nil {
 		return "", err
 	}

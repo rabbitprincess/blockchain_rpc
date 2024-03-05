@@ -6,13 +6,13 @@ import (
 )
 
 type Client struct {
-	params     *chaincfg.Params
-	rpc_client *rpcclient.Client
+	params *chaincfg.Params
+	rpc    *rpcclient.Client
 }
 
 func (t *Client) Open(params *chaincfg.Params, host, id, pw string) (err error) {
 	t.params = params
-	t.rpc_client, err = rpcclient.New(&rpcclient.ConnConfig{
+	t.rpc, err = rpcclient.New(&rpcclient.ConnConfig{
 		Host:         host,
 		User:         id,
 		Pass:         pw,
@@ -26,9 +26,9 @@ func (t *Client) Open(params *chaincfg.Params, host, id, pw string) (err error) 
 }
 
 func (t *Client) Close() {
-	if t.rpc_client == nil {
+	if t.rpc == nil {
 		return
 	}
-	t.rpc_client.Shutdown()
-	t.rpc_client = nil
+	t.rpc.Shutdown()
+	t.rpc = nil
 }

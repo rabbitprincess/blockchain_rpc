@@ -17,17 +17,17 @@ import (
 // server
 
 func (t *Client) GetServerInfo() (status *ethereum.SyncProgress, err error) {
-	return t.rpc_client.SyncProgress(context.Background())
+	return t.rpc.SyncProgress(context.Background())
 }
 
 func (t *Client) SuggestGasInfo() (gasPriceWei, gasTipCapWei *big.Int, err error) {
 	context := context.Background()
 
-	gasPriceWei, err = t.rpc_client.SuggestGasPrice(context)
+	gasPriceWei, err = t.rpc.SuggestGasPrice(context)
 	if err != nil {
 		return nil, nil, err
 	}
-	gasTipCapWei, err = t.rpc_client.SuggestGasTipCap(context)
+	gasTipCapWei, err = t.rpc.SuggestGasTipCap(context)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -62,7 +62,7 @@ func (t *Client) GetNewAddress() (privKey, address string, err error) {
 }
 
 func (t *Client) GetAddressBalance(address string) (balance string, err error) {
-	wei, err := t.rpc_client.BalanceAt(context.Background(), common.HexToAddress(address), nil)
+	wei, err := t.rpc.BalanceAt(context.Background(), common.HexToAddress(address), nil)
 	if err != nil {
 		return "", err
 	}
@@ -70,7 +70,7 @@ func (t *Client) GetAddressBalance(address string) (balance string, err error) {
 }
 
 func (t *Client) GetAddressNonce(address string) (nonce uint64, err error) {
-	return t.rpc_client.PendingNonceAt(context.Background(), common.HexToAddress(address))
+	return t.rpc.PendingNonceAt(context.Background(), common.HexToAddress(address))
 }
 
 func (t *Client) GetAddressCode(address string, blockNumber uint64) (byteCode []byte, err error) {
@@ -78,7 +78,7 @@ func (t *Client) GetAddressCode(address string, blockNumber uint64) (byteCode []
 	if blockNumber > 0 {
 		blockNumberBig = big.NewInt(int64(blockNumber))
 	}
-	return t.rpc_client.CodeAt(context.Background(), common.HexToAddress(address), blockNumberBig)
+	return t.rpc.CodeAt(context.Background(), common.HexToAddress(address), blockNumberBig)
 }
 
 func (t *Client) ValidAddress(address string) (isContract bool, err error) {
@@ -99,29 +99,29 @@ func (t *Client) ValidAddress(address string) (isContract bool, err error) {
 
 func (t *Client) GetTxInfo(txid string) (txInfo *types.Transaction, isPending bool, err error) {
 	ethTxHash := common.HexToHash(txid)
-	return t.rpc_client.TransactionByHash(context.Background(), ethTxHash)
+	return t.rpc.TransactionByHash(context.Background(), ethTxHash)
 }
 
 func (t *Client) GetTxReceipt(txid string) (txReceipt *types.Receipt, err error) {
 	ethTxHash := common.HexToHash(txid)
-	return t.rpc_client.TransactionReceipt(context.Background(), ethTxHash)
+	return t.rpc.TransactionReceipt(context.Background(), ethTxHash)
 }
 
 func (t *Client) SendTx(tx *types.Transaction) (err error) {
-	return t.rpc_client.SendTransaction(context.Background(), tx)
+	return t.rpc.SendTransaction(context.Background(), tx)
 }
 
 //-------------------------------------------------------------------------------------------//
 // block
 
 func (t *Client) GetBlockMostRecent() (blockNumber uint64, err error) {
-	return t.rpc_client.BlockNumber(context.Background())
+	return t.rpc.BlockNumber(context.Background())
 }
 
 func (t *Client) GetBlockInfo(blockNumber uint64) (blockInfo *types.Block, err error) {
-	return t.rpc_client.BlockByNumber(context.Background(), big.NewInt(int64(blockNumber)))
+	return t.rpc.BlockByNumber(context.Background(), big.NewInt(int64(blockNumber)))
 }
 
 func (t *Client) GetBlockInfoByHash(blockHash string) (blockInfo *types.Block, err error) {
-	return t.rpc_client.BlockByHash(context.Background(), common.HexToHash(blockHash))
+	return t.rpc.BlockByHash(context.Background(), common.HexToHash(blockHash))
 }

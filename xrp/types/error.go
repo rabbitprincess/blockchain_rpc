@@ -9,8 +9,8 @@ type RPCError struct {
 }
 
 func (t RPCError) Error() string {
-	bt_json, _ := json.MarshalIndent(&t, "", "\t")
-	return string(bt_json)
+	resError, _ := json.MarshalIndent(&t, "", "\t")
+	return string(resError)
 }
 
 type ErrCode int64

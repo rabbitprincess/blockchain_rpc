@@ -382,8 +382,8 @@ type Req_walletPropose struct {
 }
 
 type Req_walletPropose_params struct {
-	Seed    string        `json:"seed"`
-	KeyType TD_s_key_type `json:"key_type"`
+	Seed    string `json:"seed"`
+	KeyType Sign   `json:"key_type"`
 }
 
 type Res_walletPropose struct {
