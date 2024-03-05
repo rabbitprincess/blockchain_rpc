@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -24,16 +25,14 @@ const (
 
 func TestGetNewAddress(t *testing.T) {
 	client, err := NewClient(url)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	defer client.Close()
-	s_private_key, s_address, err := client.GetNewAddress()
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Printf("private key : %v\n", s_private_key)
-	fmt.Printf("address : %v\n", s_address)
+	privKey, addr, err := client.GetNewAddress()
+	require.NoError(t, err)
+
+	fmt.Printf("private key : %v\n", privKey)
+	fmt.Printf("address : %v\n", addr)
 }
 
 func TestWithdraw(t *testing.T) {
@@ -47,32 +46,22 @@ func TestWithdraw(t *testing.T) {
 	)
 
 	client, err := NewClient(url)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer client.Close()
 
 	// 출금 과정
 	{
 		gasPrice, gasTip, err := client.SuggestGasInfo()
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 		nonce, err := client.GetAddressNonce(from)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 		tokenInfo, err := client.GetErc20Info(contract)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 
 		rawTx := &RawTx{}
 		rawTx.Init(client, params.TestChainConfig, gasPrice, gasTip, 100000, nonce+1, uint64(tokenInfo.Decimals), privKey, from, contract, to, amount)
 		txid, err := rawTx.SendTx()
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 		fmt.Println("tx send success, txid : ", txid)
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/stretchr/testify/require"
 )
 
 func TestServerInfo(t *testing.T) {
@@ -32,15 +33,11 @@ func TestServerInfo(t *testing.T) {
 
 func TestGetAddressBalance(t *testing.T) {
 	client, err := NewClient(url)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer client.Close()
 
 	balance, err := client.GetAddressBalance(DEF_Address)
-	if err != nil {
-		t.Fatal("balance at fail |", err)
-	}
+	require.NoError(t, err, "balance at failed")
 	fmt.Printf("balance : %s\n", balance)
 }
 
@@ -49,28 +46,17 @@ func TestGetAddressBalance(t *testing.T) {
 
 func TestFeeSuggestGas(t *testing.T) {
 	client, err := NewClient(url)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer client.Close()
 
 	price, tipcap, err := client.SuggestGasInfo()
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
-	snPrice := price.String()
-	snTipCap := tipcap.String()
+	gasPriceGwei, err := Conv_WeiToGwei(price.String())
+	require.NoError(t, err)
 
-	gasPriceGwei, err := Conv_WeiToGwei(snPrice)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	gasTipCapGwei, err := Conv_WeiToGwei(snTipCap)
-	if err != nil {
-		t.Fatal(err)
-	}
+	gasTipCapGwei, err := Conv_WeiToGwei(tipcap.String())
+	require.NoError(t, err)
 
 	fmt.Printf("suggest gas price(gwei) : %v\nsuggest gas tip(gwei) : %v\n", gasPriceGwei, gasTipCapGwei)
 }
@@ -81,106 +67,80 @@ func TestFeeSuggestGas(t *testing.T) {
 func TestTxGetRawData(t *testing.T) {
 	client := &Client{}
 	err := client.Open(url)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer client.Close()
 
 	blockNumber, err := client.GetBlockMostRecent()
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	blockInfo, err := client.GetBlockInfo(blockNumber)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	txInfos := blockInfo.Transactions()
 	txLast := txInfos[blockInfo.Transactions().Len()-1]
 	txRaw, _, err := client.GetTxInfo(txLast.Hash().Hex())
-	if err != nil {
-		t.Fatal("get tx fail |", err)
-	}
+	require.NoError(t, err, "get tx failed")
 
 	hexTxid, err := EncodeTxRLP(txRaw)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	buf := bytes.NewBuffer(nil)
 	txRaw.EncodeRLP(buf)
-	pt_tx_raw__new, err := DecodeTxRLP(hexTxid)
-	if err != nil {
-		t.Fatal(err)
-	}
+	newTx, err := DecodeTxRLP(hexTxid)
+	require.NoError(t, err)
 
-	if bytes.Equal(txRaw.Value().Bytes(), pt_tx_raw__new.Value().Bytes()) != true {
-		t.Fatalf("encode decode error\n\tori : %v\n\tnew : %v\n", txRaw.Value().Bytes(), pt_tx_raw__new.Value().Bytes())
+	if bytes.Equal(txRaw.Value().Bytes(), newTx.Value().Bytes()) != true {
+		t.Fatalf("encode decode error\n\tori : %v\n\tnew : %v\n", txRaw.Value().Bytes(), newTx.Value().Bytes())
 	}
-	if bytes.Equal(txRaw.Data(), pt_tx_raw__new.Data()) != true {
-		t.Fatalf("encode decode error\n\tori : %v\n\tnew : %v\n", txRaw.Data(), pt_tx_raw__new.Data())
+	if bytes.Equal(txRaw.Data(), newTx.Data()) != true {
+		t.Fatalf("encode decode error\n\tori : %v\n\tnew : %v\n", txRaw.Data(), newTx.Data())
 	}
 }
 
 func TestGetErc20Info(t *testing.T) {
 	client, err := NewClient(url)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer client.Close()
 
 	// BNB
 	info, err := client.GetErc20Info(DEF_TokenAERGO)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	fmt.Println(info.IsFunded, info.Name, info.Symbol, info.TotalSupply)
 
 	// KCH
 	info, err = client.GetErc20Info(DEF_TokenKCH)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	fmt.Println(info.IsFunded, info.Name, info.Symbol, info.TotalSupply)
 }
 
 func TestGetErc20TokenBalance(t *testing.T) {
 	client, err := NewClient(url)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer client.Close()
 
 	balance, err := client.GetErc20BalanceOf(DEF_Address, DEF_TokenKCH)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	fmt.Println(balance)
 }
 
 func TestGetErc20QueryAndReceipt(t *testing.T) {
 	client, err := NewClient(url)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer client.Close()
 
 	// get block info
 	blockInfo, err := client.GetBlockInfo(15934533)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	blockHash := blockInfo.Hash().String()
 
 	// get logs in block ( aergo token only )
 	logs, err := client.FilterLogs([]string{DEF_TokenAERGO}, blockHash)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	// decode logs ( transfer only )
 	transfers, err := DecodeTransfers(logs)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	for _, transfer := range transfers {
 		fmt.Println("token  :", transfer.ContractAddr)
@@ -192,24 +152,18 @@ func TestGetErc20QueryAndReceipt(t *testing.T) {
 
 func TestGetAddressFrom(t *testing.T) {
 	client, err := NewClient(url)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer client.Close()
 
 	blockNumber, err := client.GetBlockMostRecent()
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	blockInfo, err := client.GetBlockInfo(blockNumber)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	for _, tx := range blockInfo.Transactions() {
 		from, err := AddressGetSender(tx, params.RopstenChainConfig)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 		fmt.Printf("tx / from : %v | %v\n", tx.Hash().String(), from)
 	}
 }
@@ -219,27 +173,25 @@ func TestGetAddressFrom(t *testing.T) {
 
 func TestBlockGetInfo(t *testing.T) {
 	client, err := NewClient(url)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer client.Close()
 
-	n8_block_number, err := client.GetBlockMostRecent()
+	blockNumber, err := client.GetBlockMostRecent()
+	require.NoError(t, err)
+
+	fmt.Printf("%v\n", blockNumber)
+	blockInfo, err := client.GetBlockInfo(blockNumber)
+	require.NoError(t, err)
+
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	fmt.Printf("%v\n", n8_block_number)
-	pt_block_info, err := client.GetBlockInfo(n8_block_number)
-	if err != nil {
-		t.Fatal(err)
-	}
+	fmt.Printf("block hash - %v\n", blockInfo.TxHash())
+	fmt.Printf("block number - %v\n", blockInfo.NumberU64())
+	fmt.Printf("tx len - %v\n", len(blockInfo.Transactions()))
 
-	fmt.Printf("block hash - %v\n", pt_block_info.TxHash())
-	fmt.Printf("block number - %v\n", pt_block_info.NumberU64())
-	fmt.Printf("tx len - %v\n", len(pt_block_info.Transactions()))
-
-	for i, tx := range pt_block_info.Transactions() {
+	for i, tx := range blockInfo.Transactions() {
 		fmt.Printf("\t%v\n", i)
 		fmt.Printf("\ttxhash - %v\n", tx.Hash())
 		fmt.Printf("\tnonce - %v\n", tx.Nonce())
@@ -250,34 +202,24 @@ func TestBlockGetInfo(t *testing.T) {
 
 func TestBlockEncode(t *testing.T) {
 	client, err := NewClient(url)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer client.Close()
 
 	blockNumber, err := client.GetBlockMostRecent()
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	blockInfo, err := client.GetBlockInfo(blockNumber)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	blockRLP, err := EncodeBlockRLP(blockInfo)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	blockInfoNew, err := DecodeBlockRLP(blockRLP)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	blockHashNew, err := EncodeBlockRLP(blockInfoNew)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	// 검증
 	if bytes.Equal(blockInfo.Extra(), blockInfoNew.Extra()) != true {
 		t.Fatalf("encode decode error\n\tori : %v\n\tnew : %v\n", blockInfo.Extra(), blockInfoNew.Extra())
