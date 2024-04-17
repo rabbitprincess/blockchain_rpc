@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/btcsuite/btcd v0.23.1
 	github.com/btcsuite/btcd/btcutil v1.1.2
-	github.com/stretchr/testify v1.7.2
+	github.com/stretchr/testify v1.8.1
 )
 
 require (
@@ -46,7 +46,7 @@ require (
 	github.com/decred/dcrd/crypto/blake256 v1.0.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
 	github.com/ethereum/go-ethereum v1.10.26
-	github.com/rabbitprincess/snum v0.0.1
+	github.com/rabbitprincess/snum_sort v0.0.6
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 )

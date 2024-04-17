@@ -11,7 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/rabbitprincess/snum"
+	"github.com/rabbitprincess/snum_sort/snum"
 )
 
 const (
@@ -140,7 +140,7 @@ func CalcFeeCost_DynamicFee(
 	}
 
 	// get fee burnt
-	if feeBurnt, err = snBaseFee.GetStr(); err != nil {
+	if feeBurnt = snBaseFee.GetStr(); feeBurnt == "" {
 		return "", "", "", err
 	}
 
