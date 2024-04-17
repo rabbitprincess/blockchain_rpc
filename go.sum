@@ -81,8 +81,8 @@ github.com/go-ole/go-ole v1.2.5/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiU
 github.com/go-stack/stack v1.8.0 h1:5SgMzNM5HxrEjV0ww2lTmX6E2Izsfxas4+YHWRs3Lsk=
 github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
 github.com/gogo/protobuf v1.1.1/go.mod h1:r8qH/GZQm5c6nD/R0oafs1akxWv10x8SbQlK7atdtwQ=
-github.com/gokch/snum v0.0.1 h1:e/S31I+HYwA5WyKsnAgiJZLT6XfjsAYkpuNPBka8/hA=
-github.com/gokch/snum v0.0.1/go.mod h1:wbWgEt2+vXTetsfgRSgM9UeeBGFwvvGpuAe/0gtOSX4=
+github.com/rabbitprincess/snum v0.0.1 h1:e/S31I+HYwA5WyKsnAgiJZLT6XfjsAYkpuNPBka8/hA=
+github.com/rabbitprincess/snum v0.0.1/go.mod h1:wbWgEt2+vXTetsfgRSgM9UeeBGFwvvGpuAe/0gtOSX4=
 github.com/golang-jwt/jwt/v4 v4.3.0 h1:kHL1vqdqWNfATmA0FNMdmZNMyZI1U6O31X4rlIPoBog=
 github.com/golang-jwt/jwt/v4 v4.3.0/go.mod h1:/xlHOz8bRuivTWchD4jCa+NbatV+wEUSzwAxVc6locg=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=

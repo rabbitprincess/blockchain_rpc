@@ -1,4 +1,4 @@
-module github.com/gokch/blockchain_rpc
+module github.com/rabbitprincess/blockchain_rpc
 
 go 1.21
 
@@ -46,7 +46,7 @@ require (
 	github.com/decred/dcrd/crypto/blake256 v1.0.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
 	github.com/ethereum/go-ethereum v1.10.26
-	github.com/gokch/snum v0.0.1
+	github.com/rabbitprincess/snum v0.0.1
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 )

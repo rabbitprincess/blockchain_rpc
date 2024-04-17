@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"math/big"
 
-	token "github.com/gokch/blockchain_rpc/eth/smart_contract"
+	token "github.com/rabbitprincess/blockchain_rpc/eth/smart_contract"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"

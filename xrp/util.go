@@ -2,7 +2,7 @@ package xrp
 
 import (
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/gokch/snum"
+	"github.com/rabbitprincess/snum"
 )
 
 const (

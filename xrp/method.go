@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gokch/blockchain_rpc/xrp/types"
+	"github.com/rabbitprincess/blockchain_rpc/xrp/types"
 )
 
 func (t *Client) sendCmd(req types.CmdReq, res types.CmdRes) (err error) {
